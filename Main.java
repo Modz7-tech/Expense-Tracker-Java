@@ -16,7 +16,7 @@ public class Main {
             System.out.print("Choose an option: ");
 
             int choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -31,7 +31,20 @@ public class Main {
                     break;
 
                 case 2:
-                    System.out.println("Viewing expenses (coming tomorrow)");
+                    if (expenses.isEmpty()) {
+                        System.out.println("No expenses recorded.");
+                    } else {
+                        double total = 0;
+                        System.out.println("\n--- Your Expenses ---");
+
+                        for (Expense e : expenses) {
+                            System.out.println(e.name + " : ₹" + e.amount);
+                            total += e.amount;
+                        }
+
+                        System.out.println("----------------------");
+                        System.out.println("Total Spending: ₹" + total);
+                    }
                     break;
 
                 case 3:
