@@ -5,6 +5,15 @@ public class Main {
 
     static final String FILE_NAME = "expenses.txt";
 
+    // Category limits for suggestions
+    static Map<String, Double> categoryLimits = new HashMap<>();
+    static {
+        categoryLimits.put("Food", 500.0);
+        categoryLimits.put("Travel", 200.0);
+        categoryLimits.put("Shopping", 1000.0);
+        categoryLimits.put("Others", 300.0);
+    }
+
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
@@ -21,7 +30,7 @@ public class Main {
             System.out.print("Choose an option: ");
 
             int choice = scanner.nextInt();
-            scanner.nextLine();
+            scanner.nextLine(); // consume newline
 
             switch (choice) {
 
@@ -33,14 +42,22 @@ public class Main {
                     double amount = scanner.nextDouble();
                     scanner.nextLine();
 
-                    System.out.print("Enter category (Food/Travel/etc): ");
+                    System.out.print("Enter category (Food/Travel/Shopping/Others): ");
                     String category = scanner.nextLine();
 
                     Expense e = new Expense(name, amount, category);
                     expenses.add(e);
                     saveAllExpenses(expenses);
-
                     System.out.println("Expense added successfully!");
+
+                    // Intelligent suggestion
+                    if(categoryLimits.containsKey(category)) {
+                        double limit = categoryLimits.get(category);
+                        if(amount > limit) {
+                            System.out.println("⚠️ Suggestion: Your " + category + " expense exceeds ₹" + limit + ". Consider reducing it!");
+                        }
+                    }
+
                     break;
 
                 case 2:
@@ -48,7 +65,6 @@ public class Main {
                         System.out.println("No expenses recorded.");
                     } else {
                         double total = 0;
-
                         System.out.println("\n--- Your Expenses ---");
 
                         for (int i = 0; i < expenses.size(); i++) {
@@ -98,13 +114,10 @@ public class Main {
     public static void saveAllExpenses(ArrayList<Expense> expenses) {
         try {
             FileWriter fw = new FileWriter(FILE_NAME);
-
             for (Expense e : expenses) {
                 fw.write(e.name + "," + e.amount + "," + e.category + "\n");
             }
-
             fw.close();
-
         } catch (IOException ex) {
             System.out.println("Error saving file.");
         }
@@ -117,18 +130,14 @@ public class Main {
             if (!file.exists()) return;
 
             Scanner fileScanner = new Scanner(file);
-
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 String[] parts = line.split(",");
-
                 String name = parts[0];
                 double amount = Double.parseDouble(parts[1]);
                 String category = parts[2];
-
                 expenses.add(new Expense(name, amount, category));
             }
-
             fileScanner.close();
 
         } catch (Exception e) {
